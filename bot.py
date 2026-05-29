@@ -84,6 +84,9 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     chat_member = update.chat_member
 
+    print("OLD:", chat_member.old_chat_member.status)
+print("NEW:", chat_member.new_chat_member.status)
+
     if (
         chat_member.old_chat_member.status in ["left", "kicked"]
         and chat_member.new_chat_member.status in ["member", "restricted"]
