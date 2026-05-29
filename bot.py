@@ -175,6 +175,7 @@ async def detectar_encuesta(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("ID DE LA ENCUESTA:")
     print(poll.id)
     print("======================\n")
+    print(poll)
 
 # =========================================
 # CUANDO ALGUIEN VOTA
