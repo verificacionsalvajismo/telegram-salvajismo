@@ -21,7 +21,7 @@ from telegram.ext import (
 # TOKEN DEL BOT
 # =========================================
 
-TOKEN = "7929600422:AAGKteeUmQOO3ckzGHWVuIecVivirBmB0S8"
+TOKEN ="7929600422:AAGKteeUmQOO3ckzGHWVuIEcVivirBmB0S8"
 
 # =========================================
 # ID DE LA ENCUESTA
