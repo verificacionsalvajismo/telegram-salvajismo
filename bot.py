@@ -155,4 +155,3 @@ app.add_handler(
 print("BOT FUNCIONANDO")
 
 app.run_polling()
-```
