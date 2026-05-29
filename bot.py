@@ -28,7 +28,7 @@ TOKEN ="7929600422:AAGKteeUmQOO3ckzGHWVuIEcVivirBmB0S8"
 # PEGAR EL ID REAL
 # =========================================
 
-POLL_ID = "PONER_ID_REAL"
+POLL_ID = "4958646825356624164"
 
 # =========================================
 # GUARDAR USUARIOS
@@ -184,6 +184,13 @@ async def detectar_encuesta(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     respuesta = update.poll_answer
+
+    print("==============")
+    print("VOTO DETECTADO")
+    print("Usuario:", respuesta.user.id)
+    print("Encuesta:", respuesta.poll_id)
+    print("Opciones:", respuesta.option_ids)
+    print("==============")
 
     user_id = respuesta.user.id
     poll_id = respuesta.poll_id
