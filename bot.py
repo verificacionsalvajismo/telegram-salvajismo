@@ -77,6 +77,11 @@ Para falar no grupo:
 
 async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
+    print("================================")
+    print("NUEVO MIEMBRO DETECTADO")
+    print(update)
+    print("================================")
+
     chat_member = update.chat_member
 
     if (
