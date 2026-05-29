@@ -1,4 +1,3 @@
-```python
 from telegram import Update, ChatPermissions
 from telegram.ext import (
     ApplicationBuilder,
@@ -9,7 +8,7 @@ from telegram.ext import (
     filters,
 )
 
-TOKEN = "PON_TU_TOKEN"
+TOKEN = -1003888263128
 
 # SE COMPLETA AUTOMÁTICAMENTE AL VER LA ENCUESTA
 POLL_ID = "PONER_ID_ENCUESTA"
