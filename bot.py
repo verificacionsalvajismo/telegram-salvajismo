@@ -11,12 +11,12 @@ from telegram.ext import (
     ApplicationBuilder,
     ContextTypes,
     ChatMemberHandler,
+    ChatJoinRequestHandler,
     PollAnswerHandler,
     CallbackQueryHandler,
     MessageHandler,
     filters,
 )
-
 # =========================================
 # TOKEN DEL BOT
 # =========================================
@@ -99,10 +99,6 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
 
-            # =========================================
-            # SILENCIAR
-            # =========================================
-
             await context.bot.restrict_chat_member(
                 chat_id=chat_id,
                 user_id=usuario.id,
@@ -111,25 +107,26 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
             )
 
-            # =========================================
-            # BOTONES IDIOMA
-            # =========================================
-
             keyboard = InlineKeyboardMarkup([
                 [
-                    InlineKeyboardButton("🇪🇸 Español", callback_data=f"es:{usuario.id}")
+                    InlineKeyboardButton(
+                        "🇪🇸 Español",
+                        callback_data=f"es:{usuario.id}"
+                    )
                 ],
                 [
-                    InlineKeyboardButton("🇺🇸 English", callback_data=f"en:{usuario.id}")
+                    InlineKeyboardButton(
+                        "🇺🇸 English",
+                        callback_data=f"en:{usuario.id}"
+                    )
                 ],
                 [
-                    InlineKeyboardButton("🇧🇷 Português", callback_data=f"pt:{usuario.id}")
+                    InlineKeyboardButton(
+                        "🇧🇷 Português",
+                        callback_data=f"pt:{usuario.id}"
+                    )
                 ]
             ])
-
-            # =========================================
-            # MENSAJE
-            # =========================================
 
             await context.bot.send_message(
                 chat_id=chat_id,
@@ -144,7 +141,20 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
             print(f"{usuario.full_name} silenciado.")
 
         except Exception as e:
-            print(e)
+            print("ERROR nuevo_miembro:", e)
+
+
+# =========================================
+# SOLICITUDES DE INGRESO
+# =========================================
+
+async def solicitud(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    print("================================")
+    print("SOLICITUD DETECTADA")
+    print(update)
+    print("================================")
+
 
 # =========================================
 # SELECCIONAR IDIOMA
@@ -161,7 +171,6 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = data[0]
     user_id = int(data[1])
 
-    # SOLO EL USUARIO PUEDE TOCAR SUS BOTONES
     if query.from_user.id != user_id:
         return
 
@@ -170,6 +179,7 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(
         text=texto
     )
+
 
 # =========================================
 # DETECTAR ENCUESTA
@@ -182,8 +192,10 @@ async def detectar_encuesta(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("\n======================")
     print("ID DE LA ENCUESTA:")
     print(poll.id)
-    print("======================\n")
+    print("======================")
     print(poll)
+    print("======================\n")
+
 
 # =========================================
 # CUANDO ALGUIEN VOTA
@@ -203,27 +215,21 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = respuesta.user.id
     poll_id = respuesta.poll_id
 
-    # SOLO NUESTRA ENCUESTA
     if poll_id != POLL_ID:
         return
 
-    # SI NO EXISTE
     if user_id not in usuarios:
+        print("Usuario no encontrado en memoria.")
         return
 
     chat_id = usuarios[user_id]
 
     try:
 
-        # =========================================
-        # DESMUTEAR
-        # =========================================
-
         await context.bot.restrict_chat_member(
             chat_id=chat_id,
             user_id=user_id,
             permissions=ChatPermissions(
-
                 can_send_messages=True,
                 can_send_audios=True,
                 can_send_documents=True,
@@ -237,10 +243,6 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         )
 
-        # =========================================
-        # MENSAJE
-        # =========================================
-
         await context.bot.send_message(
             chat_id=chat_id,
             text="✅ Usuario habilitado automáticamente."
@@ -249,7 +251,19 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Usuario {user_id} habilitado.")
 
     except Exception as e:
-        print(e)
+        print("ERROR voto:", e)
+
+
+# =========================================
+# DEBUG
+# =========================================
+
+async def debug(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    print("================================")
+    print(update)
+    print("================================")
+
 
 # =========================================
 # APP
@@ -257,7 +271,6 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 app = ApplicationBuilder().token(TOKEN).build()
 
-# NUEVOS USUARIOS
 app.add_handler(
     ChatMemberHandler(
         nuevo_miembro,
@@ -265,12 +278,14 @@ app.add_handler(
     )
 )
 
-# BOTONES IDIOMA
+app.add_handler(
+    ChatJoinRequestHandler(solicitud)
+)
+
 app.add_handler(
     CallbackQueryHandler(idioma)
 )
 
-# DETECTAR ENCUESTA
 app.add_handler(
     MessageHandler(
         filters.POLL,
@@ -278,17 +293,9 @@ app.add_handler(
     )
 )
 
-# DETECTAR VOTOS
 app.add_handler(
     PollAnswerHandler(voto)
 )
-
-print("BOT FUNCIONANDO")
-
-async def debug(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("================================")
-    print(update)
-    print("================================")
 
 app.add_handler(
     MessageHandler(
@@ -297,5 +304,7 @@ app.add_handler(
     ),
     group=999
 )
+
+print("BOT FUNCIONANDO")
 
 app.run_polling()
