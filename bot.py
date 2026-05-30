@@ -78,11 +78,6 @@ Para falar no grupo:
 
 async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    print("================================")
-    print("NUEVO MIEMBRO")
-    print(update)
-    print("================================")
-
     chat_id = update.effective_chat.id
 
     for usuario in update.message.new_chat_members:
@@ -90,54 +85,32 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
         usuarios[usuario.id] = chat_id
 
         try:
-
             await context.bot.restrict_chat_member(
                 chat_id=chat_id,
                 user_id=usuario.id,
-                permissions=ChatPermissions(
-                    can_send_messages=False
-                )
+                permissions=ChatPermissions(can_send_messages=False)
             )
 
             keyboard = InlineKeyboardMarkup([
-                [
-                    InlineKeyboardButton(
-                        "🇪🇸 Español",
-                        callback_data=f"es:{usuario.id}"
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        "🇺🇸 English",
-                        callback_data=f"en:{usuario.id}"
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        "🇧🇷 Português",
-                        callback_data=f"pt:{usuario.id}"
-                    )
-                ]
+                [InlineKeyboardButton("🇪🇸 Español", callback_data=f"es:{usuario.id}")],
+                [InlineKeyboardButton("🇺🇸 English", callback_data=f"en:{usuario.id}")],
+                [InlineKeyboardButton("🇧🇷 Português", callback_data=f"pt:{usuario.id}")]
             ])
 
-           msg = await context.bot.send_message(
-    chat_id=chat_id,
-    text=(
-        f"{usuario.mention_html()}\n\n"
-        "🌎 Seleccioná tu idioma / Select your language / Selecione seu idioma"
-    ),
-    parse_mode="HTML",
-    reply_markup=keyboard
-)
+            msg = await context.bot.send_message(
+                chat_id=chat_id,
+                text=(
+                    f"{usuario.mention_html()}\n\n"
+                    "🌎 Seleccioná tu idioma / Select your language / Selecione seu idioma"
+                ),
+                parse_mode="HTML",
+                reply_markup=keyboard
+            )
 
-context.application.create_task(
-    borrar_mensaje(
-        context,
-        chat_id,
-        msg.message_id,
-        150
-    )
-)
+            # ✔️ BORRADO CORRECTO
+            asyncio.create_task(
+                borrar_mensaje(context, chat_id, msg.message_id, 150)
+            )
 
             print(f"{usuario.full_name} silenciado")
 
@@ -243,10 +216,14 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         )
 
-       msg = await context.bot.send_message(
+      msg = await context.bot.send_message(
     chat_id=chat_id,
     text=f"✅ {respuesta.user.mention_html()} habilitado automáticamente.",
     parse_mode="HTML"
+)
+
+asyncio.create_task(
+    borrar_mensaje(context, chat_id, msg.message_id, 60)
 )
 
 context.application.create_task(
