@@ -178,13 +178,6 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     respuesta = update.poll_answer
 
-    print("==============")
-    print("VOTO DETECTADO")
-    print("Usuario:", respuesta.user.id)
-    print("Encuesta:", respuesta.poll_id)
-    print("Opciones:", respuesta.option_ids)
-    print("==============")
-
     user_id = respuesta.user.id
     poll_id = respuesta.poll_id
 
@@ -192,7 +185,6 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if user_id not in usuarios:
-        print("Usuario no encontrado en memoria.")
         return
 
     chat_id = usuarios[user_id]
@@ -216,24 +208,15 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         )
 
-       msg = await context.bot.send_message(
-       chat_id=chat_id,
-       text=f"✅ {respuesta.user.mention_html()} habilitado automáticamente.",
-        parse_mode="HTML"
-)
+        msg = await context.bot.send_message(
+            chat_id=chat_id,
+            text=f"✅ {respuesta.user.mention_html()} habilitado automáticamente.",
+            parse_mode="HTML"
+        )
 
-asyncio.create_task(
-    borrar_mensaje(context, chat_id, msg.message_id, 60)
-)
-
-context.application.create_task(
-    borrar_mensaje(
-        context,
-        chat_id,
-        msg.message_id,
-        60
-    )
-)
+        asyncio.create_task(
+            borrar_mensaje(context, chat_id, msg.message_id, 60)
+        )
 
         print(f"Usuario {user_id} habilitado.")
 
