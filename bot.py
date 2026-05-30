@@ -285,4 +285,17 @@ app.add_handler(
 
 print("BOT FUNCIONANDO")
 
+async def debug(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("================================")
+    print(update)
+    print("================================")
+
+app.add_handler(
+    MessageHandler(
+        filters.ALL,
+        debug
+    ),
+    group=999
+)
+
 app.run_polling()
