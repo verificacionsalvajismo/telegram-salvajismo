@@ -78,22 +78,13 @@ Para falar no grupo:
 async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print("================================")
-    print("NUEVO MIEMBRO DETECTADO")
+    print("NUEVO MIEMBRO")
     print(update)
     print("================================")
 
-    chat_member = update.chat_member
+    chat_id = update.effective_chat.id
 
-    print("OLD:", chat_member.old_chat_member.status)
-    print("NEW:", chat_member.new_chat_member.status)
-
-    if (
-        chat_member.old_chat_member.status in ["left", "kicked"]
-        and chat_member.new_chat_member.status in ["member", "restricted"]
-    ):
-
-        usuario = chat_member.new_chat_member.user
-        chat_id = update.effective_chat.id
+    for usuario in update.message.new_chat_members:
 
         usuarios[usuario.id] = chat_id
 
@@ -138,11 +129,10 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=keyboard
             )
 
-            print(f"{usuario.full_name} silenciado.")
+            print(f"{usuario.full_name} silenciado")
 
         except Exception as e:
-            print("ERROR nuevo_miembro:", e)
-
+            print("ERROR:", e)
 
 # =========================================
 # SOLICITUDES DE INGRESO
@@ -272,9 +262,9 @@ async def debug(update: Update, context: ContextTypes.DEFAULT_TYPE):
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(
-    ChatMemberHandler(
-        nuevo_miembro,
-        ChatMemberHandler.CHAT_MEMBER
+    MessageHandler(
+        filters.StatusUpdate.NEW_CHAT_MEMBERS,
+        nuevo_miembro
     )
 )
 
