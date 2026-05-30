@@ -216,10 +216,10 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         )
 
-      msg = await context.bot.send_message(
-    chat_id=chat_id,
-    text=f"✅ {respuesta.user.mention_html()} habilitado automáticamente.",
-    parse_mode="HTML"
+       msg = await context.bot.send_message(
+       chat_id=chat_id,
+       text=f"✅ {respuesta.user.mention_html()} habilitado automáticamente.",
+        parse_mode="HTML"
 )
 
 asyncio.create_task(
