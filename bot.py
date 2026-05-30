@@ -49,8 +49,8 @@ TEXTOS = {
 
 Para poder hablar en el grupo:
 
-1. Respondé la encuesta de edades fijada arriba.
-2. Luego quedarás habilitado automáticamente.
+1. Respondé la encuesta de edades fijada arriba para hablar.
+2. Aguarda a ser desmuteado por el administrador.
 """,
 
     "en": """
