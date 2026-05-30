@@ -109,7 +109,7 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # ✔️ BORRADO CORRECTO
             asyncio.create_task(
-                borrar_mensaje(context, chat_id, msg.message_id, 150)
+                borrar_mensaje(context, chat_id, msg.message_id, 300)
             )
 
             print(f"{usuario.full_name} silenciado")
@@ -215,7 +215,7 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         asyncio.create_task(
-            borrar_mensaje(context, chat_id, msg.message_id, 60)
+            borrar_mensaje(context, chat_id, msg.message_id, 160)
         )
 
         print(f"Usuario {user_id} habilitado.")
