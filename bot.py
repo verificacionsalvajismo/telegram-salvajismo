@@ -1,4 +1,5 @@
 import os
+import asyncio
 
 from telegram import (
     Update,
@@ -119,15 +120,24 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ]
             ])
 
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text=(
-                    f"{usuario.mention_html()}\n\n"
-                    "🌎 Seleccioná tu idioma / Select your language / Selecione seu idioma"
-                ),
-                parse_mode="HTML",
-                reply_markup=keyboard
-            )
+           msg = await context.bot.send_message(
+    chat_id=chat_id,
+    text=(
+        f"{usuario.mention_html()}\n\n"
+        "🌎 Seleccioná tu idioma / Select your language / Selecione seu idioma"
+    ),
+    parse_mode="HTML",
+    reply_markup=keyboard
+)
+
+context.application.create_task(
+    borrar_mensaje(
+        context,
+        chat_id,
+        msg.message_id,
+        150
+    )
+)
 
             print(f"{usuario.full_name} silenciado")
 
@@ -233,17 +243,37 @@ async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         )
 
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text="✅ Usuario habilitado automáticamente."
-        )
+       msg = await context.bot.send_message(
+    chat_id=chat_id,
+    text=f"✅ {respuesta.user.mention_html()} habilitado automáticamente.",
+    parse_mode="HTML"
+)
+
+context.application.create_task(
+    borrar_mensaje(
+        context,
+        chat_id,
+        msg.message_id,
+        60
+    )
+)
 
         print(f"Usuario {user_id} habilitado.")
 
     except Exception as e:
         print("ERROR voto:", e)
 
+async def borrar_mensaje(context, chat_id, message_id, segundos):
 
+    await asyncio.sleep(segundos)
+
+    try:
+        await context.bot.delete_message(
+            chat_id=chat_id,
+            message_id=message_id
+        )
+    except:
+        pass
 # =========================================
 # DEBUG
 # =========================================
