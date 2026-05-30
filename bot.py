@@ -306,5 +306,6 @@ app.add_handler(
 )
 
 print("BOT FUNCIONANDO")
+print(awaiting := "HANDLERS CARGADOS")
 
 app.run_polling()
