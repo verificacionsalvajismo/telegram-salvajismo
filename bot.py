@@ -37,7 +37,7 @@ temporizadores = {}
 # TU ID DE TELEGRAM
 # =========================================
 
-ADMIN_ID = 
+ADMIN_ID = -1003888263128
 
 # =========================================
 # MENSAJES DE VERIFICACIÓN
@@ -276,13 +276,91 @@ async def recibir_verificacion(
     try:
 
         await context.bot.send_message(
-            chat_id=TU_ID_DE_TELEGRAM,
+            chat_id=ADMIN_ID,
             text=(
                 f"📥 Nueva verificación\n\n"
                 f"Usuario: {usuario.full_name}\n"
                 f"ID: {usuario.id}"
             )
         )
+
+    except Exception as e:
+        print(e)
+
+# =========================================
+# APROBAR
+# =========================================
+
+async def aprobar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if not context.args:
+        return
+
+    try:
+
+        user_id = int(context.args[0])
+
+        if user_id not in usuarios:
+            return
+
+        usuarios[user_id]["verificado"] = True
+
+        chat_id = usuarios[user_id]["chat_id"]
+
+        msg = await context.bot.send_message(
+            chat_id=chat_id,
+            text="✅ Verificación aprobada. Bienvenido."
+        )
+
+        asyncio.create_task(
+            borrar_mensaje(
+                context,
+                chat_id,
+                msg.message_id,
+                120
+            )
+        )
+
+        print(f"{user_id} aprobado")
+
+    except Exception as e:
+        print(e)
+
+# =========================================
+# RECHAZAR
+# =========================================
+
+async def rechazar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if not context.args:
+        return
+
+    try:
+
+        user_id = int(context.args[0])
+
+        if user_id not in usuarios:
+            return
+
+        chat_id = usuarios[user_id]["chat_id"]
+
+        await context.bot.ban_chat_member(
+            chat_id,
+            user_id
+        )
+
+        await context.bot.unban_chat_member(
+            chat_id,
+            user_id
+        )
+
+        print(f"{user_id} rechazado")
 
     except Exception as e:
         print(e)
@@ -345,3 +423,48 @@ async def borrar_mensaje(
         )
     except:
         pass
+
+from telegram.ext import CommandHandler
+
+# =========================================
+# APP
+# =========================================
+
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(
+    MessageHandler(
+        filters.StatusUpdate.NEW_CHAT_MEMBERS,
+        nuevo_miembro
+    )
+)
+
+app.add_handler(
+    CallbackQueryHandler(idioma)
+)
+
+app.add_handler(
+    MessageHandler(
+        filters.PHOTO | filters.VIDEO,
+        recibir_verificacion
+    )
+)
+
+app.add_handler(
+    CommandHandler(
+        "aprobar",
+        aprobar
+    )
+)
+
+app.add_handler(
+    CommandHandler(
+        "rechazar",
+        rechazar
+    )
+)
+
+print("BOT FUNCIONANDO")
+print("HANDLERS CARGADOS")
+
+app.run_polling()
