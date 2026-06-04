@@ -195,43 +195,43 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if accion == "en":
 
-    await query.edit_message_text(
-        "Welcome.\n\n"
-        "For safety reasons you must verify yourself.\n\n"
-        "Send a photo or video showing your face while making:\n\n"
-        "👌 🖖 🤞 🤘 🤙\n\n"
-        "Include your age.\n\n"
-        "You have 10 minutes."
+        await query.edit_message_text(
+            "Welcome.\n\n"
+            "For safety reasons you must verify yourself.\n\n"
+            "Send a photo or video showing your face while making:\n\n"
+            "👌 🖖 🤞 🤘 🤙\n\n"
+            "Include your age.\n\n"
+            "You have 10 minutes."
     )
 
-    asyncio.create_task(
-        borrar_mensaje(
-            context,
-            query.message.chat_id,
-            query.message.message_id,
-            600
+         asyncio.create_task(
+            borrar_mensaje(
+                context,
+                query.message.chat_id,
+                query.message.message_id,
+                600
         )
     )
 
     return
 
-    if accion == "pt":
+   if accion == "pt":
 
-    await query.edit_message_text(
-        "Bem-vindo.\n\n"
-        "Por segurança você deve se verificar.\n\n"
-        "Envie uma foto ou vídeo mostrando o rosto fazendo:\n\n"
-        "👌 🖖 🤞 🤘 🤙\n\n"
-        "Informe também sua idade.\n\n"
-        "Você tem 10 minutos."
+        await query.edit_message_text(
+             "Bem-vindo.\n\n"
+             "Por segurança você deve se verificar.\n\n"
+             "Envie uma foto ou vídeo mostrando o rosto fazendo:\n\n"
+             "👌 🖖 🤞 🤘 🤙\n\n"
+             "Informe também sua idade.\n\n"
+             "Você tem 10 minutos."
     )
 
-    asyncio.create_task(
-        borrar_mensaje(
-            context,
-            query.message.chat_id,
-            query.message.message_id,
-            600
+        asyncio.create_task(
+            borrar_mensaje(
+                context,
+                query.message.chat_id,
+                query.message.message_id,
+                600
         )
     )
 
