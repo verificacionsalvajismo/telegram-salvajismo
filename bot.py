@@ -202,41 +202,41 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "👌 🖖 🤞 🤘 🤙\n\n"
             "Include your age.\n\n"
             "You have 10 minutes."
-    )
-
-         asyncio.create_task(
-            borrar_mensaje(
-                context,
-                query.message.chat_id,
-                query.message.message_id,
-                600
         )
-    )
-
-    return
-
-   if accion == "pt":
-
-        await query.edit_message_text(
-             "Bem-vindo.\n\n"
-             "Por segurança você deve se verificar.\n\n"
-             "Envie uma foto ou vídeo mostrando o rosto fazendo:\n\n"
-             "👌 🖖 🤞 🤘 🤙\n\n"
-             "Informe também sua idade.\n\n"
-             "Você tem 10 minutos."
-    )
 
         asyncio.create_task(
             borrar_mensaje(
                 context,
-                query.message.chat_id,
+                query.message.chat.id,
                 query.message.message_id,
                 600
+            )
         )
-    )
 
-    return
-    
+        return
+
+    if accion == "pt":
+
+        await query.edit_message_text(
+            "Bem-vindo.\n\n"
+            "Por segurança você deve se verificar.\n\n"
+            "Envie uma foto ou vídeo mostrando o rosto fazendo:\n\n"
+            "👌 🖖 🤞 🤘 🤙\n\n"
+            "Informe também sua idade.\n\n"
+            "Você tem 10 minutos."
+        )
+
+        asyncio.create_task(
+            borrar_mensaje(
+                context,
+                query.message.chat.id,
+                query.message.message_id,
+                600
+            )
+        )
+
+        return
+
     if accion == "no":
 
         datos = usuarios.get(user_id)
@@ -260,6 +260,8 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer(
             "Esperamos tu foto o video."
         )
+
+        return
 
 # =========================================
 # FOTO O VIDEO
