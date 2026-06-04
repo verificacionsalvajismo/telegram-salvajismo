@@ -1,10 +1,7 @@
-import os
 import asyncio
-import time
 
 from telegram import (
     Update,
-    ChatPermissions,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
 )
@@ -12,8 +9,6 @@ from telegram import (
 from telegram.ext import (
     ApplicationBuilder,
     ContextTypes,
-    ChatMemberHandler,
-    ChatJoinRequestHandler,
     CallbackQueryHandler,
     MessageHandler,
     filters,
@@ -31,13 +26,12 @@ TOKEN ="7929600422:AAGKteeUmQOO3ckzGHWVuIEcVivirBmB0S8"
 usuarios = {}
 
 # usuario_id -> tarea de expulsión
-temporizadores = {}
 
 # =========================================
 # TU ID DE TELEGRAM
 # =========================================
 
-ADMIN_ID = -1003888263128
+ADMIN_ID = 8011642705
 
 # =========================================
 # MENSAJES DE VERIFICACIÓN
@@ -140,14 +134,12 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=(
                     f"{usuario.mention_html()}\n\n"
                     "👋 Bienvenido.\n\n"
-                    "Por protección de los miembros y seguridad del grupo "
-                    "debes verificarte.\n\n"
-                    "📸 Enviá una FOTO o VIDEO mostrando tu rostro "
-                    "haciendo una o más de estas señas:\n\n"
+                    "Por protección de los miembros y seguridad del grupo debes verificarte.\n\n"
+                    "📸 Enviá una FOTO o VIDEO donde aparezcas haciendo una o más de estas señas:\n\n"
                     "👌 🖖 🤞 🤘 🤙\n\n"
                     "Además indicá tu edad.\n\n"
                     "⏳ Disponés de 10 minutos.\n\n"
-                    "Si necesitás más tiempo avisá en el grupo."
+                    "Si no completás la verificación serás expulsado automáticamente."
                 ),
                 reply_markup=keyboard
             )
@@ -157,7 +149,7 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     context,
                     chat_id,
                     msg.message_id,
-                    1800
+                    600
                 )
             )
 
@@ -203,30 +195,48 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if accion == "en":
 
-        await query.edit_message_text(
-            "Welcome.\n\n"
-            "For safety reasons you must verify yourself.\n\n"
-            "Send a photo or video showing your face while making:\n\n"
-            "👌 🖖 🤞 🤘 🤙\n\n"
-            "Include your age.\n\n"
-            "You have 10 minutes."
-        )
+    await query.edit_message_text(
+        "Welcome.\n\n"
+        "For safety reasons you must verify yourself.\n\n"
+        "Send a photo or video showing your face while making:\n\n"
+        "👌 🖖 🤞 🤘 🤙\n\n"
+        "Include your age.\n\n"
+        "You have 10 minutes."
+    )
 
-        return
+    asyncio.create_task(
+        borrar_mensaje(
+            context,
+            query.message.chat_id,
+            query.message.message_id,
+            600
+        )
+    )
+
+    return
 
     if accion == "pt":
 
-        await query.edit_message_text(
-            "Bem-vindo.\n\n"
-            "Por segurança você deve se verificar.\n\n"
-            "Envie uma foto ou vídeo mostrando o rosto fazendo:\n\n"
-            "👌 🖖 🤞 🤘 🤙\n\n"
-            "Informe também sua idade.\n\n"
-            "Você tem 10 minutos."
+    await query.edit_message_text(
+        "Bem-vindo.\n\n"
+        "Por segurança você deve se verificar.\n\n"
+        "Envie uma foto ou vídeo mostrando o rosto fazendo:\n\n"
+        "👌 🖖 🤞 🤘 🤙\n\n"
+        "Informe também sua idade.\n\n"
+        "Você tem 10 minutos."
+    )
+
+    asyncio.create_task(
+        borrar_mensaje(
+            context,
+            query.message.chat_id,
+            query.message.message_id,
+            600
         )
+    )
 
-        return
-
+    return
+    
     if accion == "no":
 
         datos = usuarios.get(user_id)
@@ -273,94 +283,42 @@ async def recibir_verificacion(
 
     usuarios[usuario.id]["verificado"] = True
 
+    edad = ""
+
+    if update.message.caption:
+        edad = update.message.caption
+    else:
+        edad = "Sin edad indicada"
+
     try:
 
-        await context.bot.send_message(
-            chat_id=ADMIN_ID,
-            text=(
-                f"📥 Nueva verificación\n\n"
-                f"Usuario: {usuario.full_name}\n"
-                f"ID: {usuario.id}"
+        if tiene_foto:
+
+            await context.bot.send_photo(
+                chat_id=ADMIN_ID,
+                photo=update.message.photo[-1].file_id,
+                caption=(
+                    f"📥 Nueva verificación\n\n"
+                    f"Usuario: {usuario.full_name}\n"
+                    f"ID: {usuario.id}\n\n"
+                    f"Edad / texto:\n{edad}"
+                )
             )
-        )
 
-    except Exception as e:
-        print(e)
+        elif tiene_video:
 
-# =========================================
-# APROBAR
-# =========================================
-
-async def aprobar(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if update.effective_user.id != ADMIN_ID:
-        return
-
-    if not context.args:
-        return
-
-    try:
-
-        user_id = int(context.args[0])
-
-        if user_id not in usuarios:
-            return
-
-        usuarios[user_id]["verificado"] = True
-
-        chat_id = usuarios[user_id]["chat_id"]
-
-        msg = await context.bot.send_message(
-            chat_id=chat_id,
-            text="✅ Verificación aprobada. Bienvenido."
-        )
-
-        asyncio.create_task(
-            borrar_mensaje(
-                context,
-                chat_id,
-                msg.message_id,
-                120
+            await context.bot.send_video(
+                chat_id=ADMIN_ID,
+                video=update.message.video.file_id,
+                caption=(
+                    f"📥 Nueva verificación\n\n"
+                    f"Usuario: {usuario.full_name}\n"
+                    f"ID: {usuario.id}\n\n"
+                    f"Edad / texto:\n{edad}"
+                )
             )
-        )
 
-        print(f"{user_id} aprobado")
-
-    except Exception as e:
-        print(e)
-
-# =========================================
-# RECHAZAR
-# =========================================
-
-async def rechazar(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if update.effective_user.id != ADMIN_ID:
-        return
-
-    if not context.args:
-        return
-
-    try:
-
-        user_id = int(context.args[0])
-
-        if user_id not in usuarios:
-            return
-
-        chat_id = usuarios[user_id]["chat_id"]
-
-        await context.bot.ban_chat_member(
-            chat_id,
-            user_id
-        )
-
-        await context.bot.unban_chat_member(
-            chat_id,
-            user_id
-        )
-
-        print(f"{user_id} rechazado")
+        print(f"{usuario.full_name} verificado")
 
     except Exception as e:
         print(e)
@@ -424,8 +382,6 @@ async def borrar_mensaje(
     except:
         pass
 
-from telegram.ext import CommandHandler
-
 # =========================================
 # APP
 # =========================================
@@ -450,21 +406,13 @@ app.add_handler(
     )
 )
 
-app.add_handler(
-    CommandHandler(
-        "aprobar",
-        aprobar
-    )
-)
-
-app.add_handler(
-    CommandHandler(
-        "rechazar",
-        rechazar
-    )
-)
-
 print("BOT FUNCIONANDO")
 print("HANDLERS CARGADOS")
+
+async def error_handler(update, context):
+    print("ERROR:")
+    print(context.error)
+
+app.add_error_handler(error_handler)
 
 app.run_polling()
