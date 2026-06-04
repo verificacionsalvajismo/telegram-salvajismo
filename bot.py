@@ -62,8 +62,6 @@ For member protection and group safety, you must verify yourself.
 
 👌 🖖 🤞 🤘 🤙
 
-Also include your age.
-
 If verification is not completed within the allowed time, you will be automatically removed.
 
 Use the buttons below to continue.
@@ -137,7 +135,6 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "Por protección de los miembros y seguridad del grupo debes verificarte.\n\n"
                     "📸𝐄𝐧𝐯í𝐚 𝐭𝐮 𝐄𝐃𝐀𝐃 𝐲  𝐮𝐧𝐚 𝐅𝐎𝐓𝐎 𝐨 𝐕𝐈𝐃𝐄𝐎 (𝐨𝐛𝐥𝐢𝐠𝐚𝐭𝐨𝐫𝐢𝐚𝐦𝐞𝐧𝐭𝐞 𝐝𝐞𝐬𝐧𝐮𝐝𝐨 𝐨 𝐞𝐧 𝐛𝐨𝐱𝐞𝐫) 𝐡𝐚𝐜𝐢𝐞𝐧𝐝𝐨 𝐮𝐧𝐚 𝐨 𝐦á𝐬 𝐝𝐞 𝐞𝐬𝐭𝐚𝐬 𝐬𝐞ñ𝐚𝐬:\n\n"
                     "👌 🖖 🤞 🤘 🤙\n\n"
-                    "Además indicá tu edad.\n\n"
                     "⏳ Disponés de 10 minutos o escribe en el chat que necesitas más tiempo.\n\n"
                     "Si no completás la verificación serás expulsado automáticamente."
                 ),
