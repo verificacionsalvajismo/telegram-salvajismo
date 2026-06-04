@@ -135,10 +135,10 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"{usuario.mention_html()}\n\n"
                     "👋 Bienvenido.\n\n"
                     "Por protección de los miembros y seguridad del grupo debes verificarte.\n\n"
-                    "📸 Enviá una FOTO o VIDEO donde aparezcas haciendo una o más de estas señas:\n\n"
+                    "📸𝐄𝐧𝐯í𝐚 𝐭𝐮 𝐄𝐃𝐀𝐃 𝐲  𝐮𝐧𝐚 𝐅𝐎𝐓𝐎 𝐨 𝐕𝐈𝐃𝐄𝐎 (𝐨𝐛𝐥𝐢𝐠𝐚𝐭𝐨𝐫𝐢𝐚𝐦𝐞𝐧𝐭𝐞 𝐝𝐞𝐬𝐧𝐮𝐝𝐨 𝐨 𝐞𝐧 𝐛𝐨𝐱𝐞𝐫) 𝐡𝐚𝐜𝐢𝐞𝐧𝐝𝐨 𝐮𝐧𝐚 𝐨 𝐦á𝐬 𝐝𝐞 𝐞𝐬𝐭𝐚𝐬 𝐬𝐞ñ𝐚𝐬:\n\n"
                     "👌 🖖 🤞 🤘 🤙\n\n"
                     "Además indicá tu edad.\n\n"
-                    "⏳ Disponés de 10 minutos.\n\n"
+                    "⏳ Disponés de 10 minutos o escribe en el chat que necesitas más tiempo.\n\n"
                     "Si no completás la verificación serás expulsado automáticamente."
                 ),
                 reply_markup=keyboard
@@ -198,10 +198,9 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(
             "Welcome.\n\n"
             "For safety reasons you must verify yourself.\n\n"
-            "Send a photo or video showing your face while making:\n\n"
+            "𝐒𝐞𝐧𝐝 𝐲𝐨𝐮𝐫 𝐀𝐆𝐄 𝐚𝐧𝐝 𝐚 𝐏𝐇𝐎𝐓𝐎 𝐨𝐫 𝐕𝐈𝐃𝐄𝐎 (𝐦𝐮𝐬𝐭 𝐛𝐞 𝐧𝐮𝐝𝐞 𝐨𝐫 𝐢𝐧 𝐮𝐧𝐝𝐞𝐫𝐰𝐞𝐚𝐫) 𝐦𝐚𝐤𝐢𝐧𝐠 𝐨𝐧𝐞 𝐨𝐫 𝐦𝐨𝐫𝐞 𝐨𝐟 𝐭𝐡𝐞 𝐟𝐨𝐥𝐥𝐨𝐰𝐢𝐧𝐠 𝐬𝐢𝐠𝐧𝐬:\n\n"
             "👌 🖖 🤞 🤘 🤙\n\n"
-            "Include your age.\n\n"
-            "You have 10 minutes."
+            "You have 10 minutes or request more time by writing it in the chat.\n\n"
         )
 
         asyncio.create_task(
@@ -220,10 +219,9 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(
             "Bem-vindo.\n\n"
             "Por segurança você deve se verificar.\n\n"
-            "Envie uma foto ou vídeo mostrando o rosto fazendo:\n\n"
+            "𝗘𝗻𝘃𝗶𝗲 𝘀𝘂𝗮 𝗜𝗗𝗔𝗗𝗘 𝗲 𝘂𝗺𝗮 𝗙𝗢𝗧𝗢 𝗼𝘂 𝗩𝗜𝗗𝗘𝗢 (𝗱𝗲𝘃𝗲 𝘀𝗲𝗿 𝘃𝗼𝗰ê 𝗻𝘂 𝗼𝘂 𝗱𝗲 𝗿𝗼𝘂𝗽𝗮 í𝗻𝘁𝗶𝗺𝗮) 𝗳𝗮𝘇𝗲𝗻𝗱𝗼 𝘂𝗺 𝗼𝘂 𝗺𝗮𝗶𝘀 𝗱𝗼𝘀 𝘀𝗲𝗴𝘂𝗶𝗻𝘁𝗲𝘀 𝘀𝗶𝗻𝗮𝗶𝘀:\n\n"
             "👌 🖖 🤞 🤘 🤙\n\n"
-            "Informe também sua idade.\n\n"
-            "Você tem 10 minutos."
+            "Você tem 10 minutosou solicite mais tempo escrevendo no chat.\n\n"
         )
 
         asyncio.create_task(
