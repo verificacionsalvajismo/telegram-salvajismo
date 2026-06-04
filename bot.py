@@ -1,5 +1,6 @@
 import os
 import asyncio
+import time
 
 from telegram import (
     Update,
@@ -13,7 +14,6 @@ from telegram.ext import (
     ContextTypes,
     ChatMemberHandler,
     ChatJoinRequestHandler,
-    PollAnswerHandler,
     CallbackQueryHandler,
     MessageHandler,
     filters,
@@ -25,21 +25,16 @@ from telegram.ext import (
 TOKEN ="7929600422:AAGKteeUmQOO3ckzGHWVuIEcVivirBmB0S8"
 
 # =========================================
-# ID DE LA ENCUESTA
-# PEGAR EL ID REAL
-# =========================================
-
-POLL_ID = "4958646825356624164"
-
-# =========================================
 # GUARDAR USUARIOS
-# user_id -> chat_id
 # =========================================
 
 usuarios = {}
 
+# usuario_id -> tarea de expulsión
+temporizadores = {}
+
 # =========================================
-# MENSAJES
+# MENSAJES DE VERIFICACIÓN
 # =========================================
 
 TEXTOS = {
@@ -47,28 +42,45 @@ TEXTOS = {
     "es": """
 🚨 Bienvenido.
 
-Para poder hablar en el grupo:
+Por protección de los miembros y seguridad del grupo, debes verificarte.
 
-1. Respondé la encuesta de edades fijada arriba para hablar.
-2. Aguarda a ser desmuteado por el administrador.
+✅ Envía tu EDAD y  una FOTO o VIDEO (preferiblemente desnudo o en boxer) donde aparezcas haciendo una o más de estas señas:
+
+👌 🖖 🤞 🤘 🤙
+
+Si no completas la verificación dentro del tiempo establecido serás expulsado automáticamente.
+
+Usa los botones de abajo para continuar.
 """,
 
     "en": """
 🚨 Welcome.
 
-To speak in the group:
+For member protection and group safety, you must verify yourself.
 
-1. Answer the pinned age poll above.
-2. You will then be automatically unmuted.
+✅ Send your AGE and a PHOTO or VIDEO showing yourself making one or more of these hand signs:
+
+👌 🖖 🤞 🤘 🤙
+
+Also include your age.
+
+If verification is not completed within the allowed time, you will be automatically removed.
+
+Use the buttons below to continue.
 """,
 
     "pt": """
 🚨 Bem-vindo.
 
-Para falar no grupo:
+Para proteção dos membros e segurança do grupo, você deve se verificar.
 
-1. Responda à enquete de idade fixada acima.
-2. Depois você será desbloqueado automaticamente.
+✅ Envie sua IDADE também uma FOTO ou VÍDEO mostrando você fazendo um ou mais destes sinais:
+
+👌 🖖 🤞 🤘 🤙
+
+Se a verificação não for concluída dentro do prazo, você será removido automaticamente.
+
+Use os botões abaixo para continuar.
 """
 }
 
@@ -82,43 +94,82 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     for usuario in update.message.new_chat_members:
 
-        usuarios[usuario.id] = chat_id
+        usuarios[usuario.id] = {
+            "chat_id": chat_id,
+            "verificado": False
+        }
 
         try:
-            await context.bot.restrict_chat_member(
-                chat_id=chat_id,
-                user_id=usuario.id,
-                permissions=ChatPermissions(can_send_messages=False)
-            )
 
             keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🇪🇸 Español", callback_data=f"es:{usuario.id}")],
-                [InlineKeyboardButton("🇺🇸 English", callback_data=f"en:{usuario.id}")],
-                [InlineKeyboardButton("🇧🇷 Português", callback_data=f"pt:{usuario.id}")]
+                [
+                    InlineKeyboardButton(
+                        "✅ Sí, voy a verificarme",
+                        callback_data=f"ok:{usuario.id}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        "❌ No quiero verificarme",
+                        callback_data=f"no:{usuario.id}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        "🇺🇸 English",
+                        callback_data=f"en:{usuario.id}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        "🇧🇷 Português",
+                        callback_data=f"pt:{usuario.id}"
+                    )
+                ]
             ])
 
             msg = await context.bot.send_message(
                 chat_id=chat_id,
+                parse_mode="HTML",
                 text=(
                     f"{usuario.mention_html()}\n\n"
-                    "🌎 Seleccioná tu idioma / Select your language / Selecione seu idioma"
+                    "👋 Bienvenido.\n\n"
+                    "Por protección de los miembros y seguridad del grupo "
+                    "debes verificarte.\n\n"
+                    "📸 Enviá una FOTO o VIDEO mostrando tu rostro "
+                    "haciendo una o más de estas señas:\n\n"
+                    "👌 🖖 🤞 🤘 🤙\n\n"
+                    "Además indicá tu edad.\n\n"
+                    "⏳ Disponés de 10 minutos.\n\n"
+                    "Si necesitás más tiempo avisá en el grupo."
                 ),
-                parse_mode="HTML",
                 reply_markup=keyboard
             )
 
-            # ✔️ BORRADO CORRECTO
             asyncio.create_task(
-                borrar_mensaje(context, chat_id, msg.message_id, 300)
+                borrar_mensaje(
+                    context,
+                    chat_id,
+                    msg.message_id,
+                    1800
+                )
             )
 
-            print(f"{usuario.full_name} silenciado")
+            asyncio.create_task(
+                controlar_tiempo(
+                    context,
+                    chat_id,
+                    usuario.id
+                )
+            )
+
+            print(f"{usuario.full_name} registrado")
 
         except Exception as e:
             print("ERROR:", e)
 
 # =========================================
-# SOLICITUDES DE INGRESO
+# SOLICITUDES
 # =========================================
 
 async def solicitud(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -128,9 +179,8 @@ async def solicitud(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(update)
     print("================================")
 
-
 # =========================================
-# SELECCIONAR IDIOMA
+# BOTONES
 # =========================================
 
 async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -139,153 +189,153 @@ async def idioma(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.answer()
 
-    data = query.data.split(":")
-
-    lang = data[0]
-    user_id = int(data[1])
+    accion, user_id = query.data.split(":")
+    user_id = int(user_id)
 
     if query.from_user.id != user_id:
         return
 
-    texto = TEXTOS[lang]
+    if accion == "en":
 
-    await query.edit_message_text(
-        text=texto
-    )
+        await query.edit_message_text(
+            "Welcome.\n\n"
+            "For safety reasons you must verify yourself.\n\n"
+            "Send a photo or video showing your face while making:\n\n"
+            "👌 🖖 🤞 🤘 🤙\n\n"
+            "Include your age.\n\n"
+            "You have 10 minutes."
+        )
 
-
-# =========================================
-# DETECTAR ENCUESTA
-# =========================================
-
-async def detectar_encuesta(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    poll = update.message.poll
-
-    print("\n======================")
-    print("ID DE LA ENCUESTA:")
-    print(poll.id)
-    print("======================")
-    print(poll)
-    print("======================\n")
-
-
-# =========================================
-# CUANDO ALGUIEN VOTA
-# =========================================
-
-async def voto(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    respuesta = update.poll_answer
-
-    user_id = respuesta.user.id
-    poll_id = respuesta.poll_id
-
-    if poll_id != POLL_ID:
         return
 
-    if user_id not in usuarios:
+    if accion == "pt":
+
+        await query.edit_message_text(
+            "Bem-vindo.\n\n"
+            "Por segurança você deve se verificar.\n\n"
+            "Envie uma foto ou vídeo mostrando o rosto fazendo:\n\n"
+            "👌 🖖 🤞 🤘 🤙\n\n"
+            "Informe também sua idade.\n\n"
+            "Você tem 10 minutos."
+        )
+
         return
 
-    chat_id = usuarios[user_id]
+    if accion == "no":
+
+        datos = usuarios.get(user_id)
+
+        if datos:
+
+            await context.bot.ban_chat_member(
+                datos["chat_id"],
+                user_id
+            )
+
+            await context.bot.unban_chat_member(
+                datos["chat_id"],
+                user_id
+            )
+
+        return
+
+    if accion == "ok":
+
+        await query.answer(
+            "Esperamos tu foto o video."
+        )
+
+# =========================================
+# FOTO O VIDEO
+# =========================================
+
+async def recibir_verificacion(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    usuario = update.effective_user
+
+    if usuario.id not in usuarios:
+        return
+
+    tiene_foto = update.message.photo
+    tiene_video = update.message.video
+
+    if not tiene_foto and not tiene_video:
+        return
+
+    usuarios[usuario.id]["verificado"] = True
 
     try:
 
-        await context.bot.restrict_chat_member(
-            chat_id=chat_id,
-            user_id=user_id,
-            permissions=ChatPermissions(
-                can_send_messages=True,
-                can_send_audios=True,
-                can_send_documents=True,
-                can_send_photos=True,
-                can_send_videos=True,
-                can_send_video_notes=True,
-                can_send_voice_notes=True,
-                can_send_polls=True,
-                can_send_other_messages=True,
-                can_add_web_page_previews=True,
+        await context.bot.send_message(
+            chat_id=TU_ID_DE_TELEGRAM,
+            text=(
+                f"📥 Nueva verificación\n\n"
+                f"Usuario: {usuario.full_name}\n"
+                f"ID: {usuario.id}"
             )
         )
 
-        msg = await context.bot.send_message(
-            chat_id=chat_id,
-            text=f"✅ {respuesta.user.mention_html()} habilitado automáticamente.",
-            parse_mode="HTML"
+    except Exception as e:
+        print(e)
+
+# =========================================
+# CONTROL TIEMPO
+# =========================================
+
+async def controlar_tiempo(
+    context,
+    chat_id,
+    user_id
+):
+
+    await asyncio.sleep(600)
+
+    datos = usuarios.get(user_id)
+
+    if not datos:
+        return
+
+    if datos["verificado"]:
+        return
+
+    try:
+
+        await context.bot.ban_chat_member(
+            chat_id,
+            user_id
         )
 
-        asyncio.create_task(
-            borrar_mensaje(context, chat_id, msg.message_id, 160)
+        await context.bot.unban_chat_member(
+            chat_id,
+            user_id
         )
 
-        print(f"Usuario {user_id} habilitado.")
+        print(f"{user_id} expulsado")
 
     except Exception as e:
-        print("ERROR voto:", e)
+        print(e)
 
-async def borrar_mensaje(context, chat_id, message_id, segundos):
+# =========================================
+# BORRAR MENSAJES
+# =========================================
+
+async def borrar_mensaje(
+    context,
+    chat_id,
+    message_id,
+    segundos
+):
 
     await asyncio.sleep(segundos)
 
     try:
+
         await context.bot.delete_message(
-            chat_id=chat_id,
-            message_id=message_id
+            chat_id,
+            message_id
         )
     except:
         pass
-# =========================================
-# DEBUG
-# =========================================
-
-async def debug(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    print("================================")
-    print(update)
-    print("================================")
-
-
-# =========================================
-# APP
-# =========================================
-
-app = ApplicationBuilder().token(TOKEN).build()
-
-app.add_handler(
-    MessageHandler(
-        filters.StatusUpdate.NEW_CHAT_MEMBERS,
-        nuevo_miembro
-    )
-)
-
-app.add_handler(
-    ChatJoinRequestHandler(solicitud)
-)
-
-app.add_handler(
-    CallbackQueryHandler(idioma)
-)
-
-app.add_handler(
-    MessageHandler(
-        filters.POLL,
-        detectar_encuesta
-    )
-)
-
-app.add_handler(
-    PollAnswerHandler(voto)
-)
-
-app.add_handler(
-    MessageHandler(
-        filters.ALL,
-        debug
-    ),
-    group=999
-)
-
-print("BOT FUNCIONANDO")
-print(awaiting := "HANDLERS CARGADOS")
-
-app.run_polling()
