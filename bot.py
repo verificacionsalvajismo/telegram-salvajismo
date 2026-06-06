@@ -145,7 +145,7 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "🇧🇷 PORTUGUÊS\n"
                 "Você deve selecionar sua idade para permanecer no grupo.\n\n"
 
-                "⏳ Tienes 5 minutos para responder."
+                "⏳ Tienes 5 minutos para responder o el bot te eliminará."
             ),
             parse_mode=parse_mode,
             reply_markup=keyboard
