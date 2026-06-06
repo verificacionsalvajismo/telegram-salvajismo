@@ -296,4 +296,6 @@ async def error_handler(update, context):
 
 app.add_error_handler(error_handler)
 
-app.run_polling()
+app.run_polling(
+    drop_pending_updates=True
+)
