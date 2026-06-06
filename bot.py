@@ -53,106 +53,118 @@ EDADES_EXPULSAR = [
 # =========================================
 
 async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+chat_id = update.effective_chat.id
 
-    chat_id = update.effective_chat.id
+for usuario in update.message.new_chat_members:
 
-    for usuario in update.message.new_chat_members:
+    if usuario.is_bot:
+        continue
 
-        if usuario.is_bot:
-            continue
-
-        keyboard = InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton(
-                    "12-14",
-                    callback_data=f"edad:12-14:{usuario.id}"
-                ),
-                InlineKeyboardButton(
-                    "15-17",
-                    callback_data=f"edad:15-17:{usuario.id}"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "18-19",
-                    callback_data=f"edad:18-19:{usuario.id}"
-                ),
-                InlineKeyboardButton(
-                    "20-22",
-                    callback_data=f"edad:20-22:{usuario.id}"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "23-25",
-                    callback_data=f"edad:23-25:{usuario.id}"
-                ),
-                InlineKeyboardButton(
-                    "26-28",
-                    callback_data=f"edad:26-28:{usuario.id}"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "29-30",
-                    callback_data=f"edad:29-30:{usuario.id}"
-                ),
-                InlineKeyboardButton(
-                    "+30",
-                    callback_data=f"edad:+30:{usuario.id}"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "+35",
-                    callback_data=f"edad:+35:{usuario.id}"
-                ),
-                InlineKeyboardButton(
-                    "+40",
-                    callback_data=f"edad:+40:{usuario.id}"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "+45",
-                    callback_data=f"edad:+45:{usuario.id}"
-                ),
-                InlineKeyboardButton(
-                    "+50",
-                    callback_data=f"edad:+50:{usuario.id}"
-                )
-            ]
-        ])
-
-        mensaje = await context.bot.send_message(
-            chat_id=chat_id,
-            text=(
-                f"👋 Bienvenido {usuario.full_name}\n\n"
-                "🇪🇸 ESPAÑOL\n"
-                "Debes seleccionar tu edad para permanecer en el grupo.\n\n"
-                "🇺🇸 ENGLISH\n"
-                "You must select your age to stay in the group.\n\n"
-                "🇧🇷 PORTUGUÊS\n"
-                "Você deve selecionar sua idade para permanecer no grupo.\n\n"
-                "⏳ Tienes 5 minutos para responder."
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "12-14",
+                callback_data=f"edad:12-14:{usuario.id}"
             ),
-            reply_markup=keyboard
-        )
-
-        usuarios[usuario.id] = {
-            "chat_id": chat_id,
-            "respondio": False,
-            "mensaje_id": mensaje.message_id
-        }
-
-        asyncio.create_task(
-            controlar_tiempo(
-                context,
-                chat_id,
-                usuario.id
+            InlineKeyboardButton(
+                "15-17",
+                callback_data=f"edad:15-17:{usuario.id}"
             )
-        )
+        ],
+        [
+            InlineKeyboardButton(
+                "18-19",
+                callback_data=f"edad:18-19:{usuario.id}"
+            ),
+            InlineKeyboardButton(
+                "20-22",
+                callback_data=f"edad:20-22:{usuario.id}"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "23-25",
+                callback_data=f"edad:23-25:{usuario.id}"
+            ),
+            InlineKeyboardButton(
+                "26-28",
+                callback_data=f"edad:26-28:{usuario.id}"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "29-30",
+                callback_data=f"edad:29-30:{usuario.id}"
+            ),
+            InlineKeyboardButton(
+                "+30",
+                callback_data=f"edad:+30:{usuario.id}"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "+35",
+                callback_data=f"edad:+35:{usuario.id}"
+            ),
+            InlineKeyboardButton(
+                "+40",
+                callback_data=f"edad:+40:{usuario.id}"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "+45",
+                callback_data=f"edad:+45:{usuario.id}"
+            ),
+            InlineKeyboardButton(
+                "+50",
+                callback_data=f"edad:+50:{usuario.id}"
+            )
+        ]
+    ])
 
+    if usuario.username:
+        nombre = f"@{usuario.username}"
+        parse_mode = None
+    else:
+        nombre = usuario.mention_html()
+        parse_mode = "HTML"
+
+    mensaje = await context.bot.send_message(
+        chat_id=chat_id,
+        text=(
+            f"👋 Bienvenido {nombre}\n\n"
+
+            "🇪🇸 ESPAÑOL\n"
+            "Debes seleccionar tu edad para permanecer en el grupo.\n\n"
+
+            "🇺🇸 ENGLISH\n"
+            "You must select your age to stay in the group.\n\n"
+
+            "🇧🇷 PORTUGUÊS\n"
+            "Você deve selecionar sua idade para permanecer no grupo.\n\n"
+
+            "⏳ Tienes 5 minutos para responder."
+        ),
+        parse_mode=parse_mode,
+        reply_markup=keyboard
+    )
+
+    usuarios[usuario.id] = {
+        "chat_id": chat_id,
+        "respondio": False,
+        "mensaje_id": mensaje.message_id
+    }
+
+    asyncio.create_task(
+        controlar_tiempo(
+            context,
+            chat_id,
+            usuario.id
+        )
+    )
+    
 # =========================================
 # CALLBACK DE EDAD
 # =========================================
