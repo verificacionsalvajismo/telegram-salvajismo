@@ -136,16 +136,13 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text=(
                 f"👋 Bienvenido {nombre}\n\n"
 
-                "🇪🇸 ESPAÑOL\n"
-                "Debes seleccionar tu edad para permanecer en el grupo.\n\n"
+                "🇪🇸Debes seleccionar tu edad para permanecer en el grupo.\n\n"
 
-                "🇺🇸 ENGLISH\n"
-                "You must select your age to stay in the group.\n\n"
+                "🇺🇸You must select your age to stay in the group.\n\n"
 
-                "🇧🇷 PORTUGUÊS\n"
-                "Você deve selecionar sua idade para permanecer no grupo.\n\n"
+                "🇧🇷Você deve selecionar sua idade para permanecer no grupo.\n\n"
 
-                "⏳ Tienes 5 minutos para responder o el bot te eliminará."
+                "⏳ TIENES 5 MINUTOS para seleccionar la opcion con tu edad o EL BOT TE ELIMINARÁ."
             ),
             parse_mode=parse_mode,
             reply_markup=keyboard
