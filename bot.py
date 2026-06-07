@@ -136,11 +136,11 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text=(
                 f"👋 Bienvenido/Welcome {nombre}\n\n"
 
-                "🇪🇸 Selecciona tu edad usando los botones de abajo. Ignora este mensaje y serás expulsado por el bot en unos minutos.\n\n"
+                "🇪🇸 SELECIONA TU EDAD USANDO LOS BOTONES DEL MENSAJE. Ignora este mensaje y serás expulsado por el bot en unos minutos.\n\n"
 
-                "🇺🇸 Select your age using the buttons below. Ignore this message and you will be removed by the bot in a few minutes.\n\n"
+                "🇺🇸 SELECT YOUR AGE USING THE BUTTONS BELOW. Ignore this message and you will be removed by the bot in a few minutes.\n\n"
 
-                "🇧🇷Selecione sua idade usando os botões abaixo. Ignore esta mensagem e você será removido pelo bot em alguns minutos .\n\n"
+                "🇧🇷 SELECCIONE SUA IDADE USANDO OS BOTÕES ABAIXO. Ignore esta mensagem e você será removido pelo bot em alguns minutos .\n\n"
                 
             ),
             parse_mode=parse_mode,
