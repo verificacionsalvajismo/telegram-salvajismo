@@ -134,15 +134,14 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mensaje = await context.bot.send_message(
             chat_id=chat_id,
             text=(
-                f"👋 Bienvenido {nombre}\n\n"
+                f"👋 Bienvenido/Welcome {nombre}\n\n"
 
-                "🇪🇸Debes seleccionar tu edad para permanecer en el grupo.\n\n"
+                "🇪🇸 Selecciona tu edad usando los botones de abajo. Ignora este mensaje y serás expulsado por el bot en unos minutos.\n\n"
 
-                "🇺🇸You must select your age to stay in the group.\n\n"
+                "🇺🇸 Select your age using the buttons below. Ignore this message and you will be removed by the bot in a few minutes.\n\n"
 
-                "🇧🇷Você deve selecionar sua idade para permanecer no grupo.\n\n"
-
-                "⏳ TIENES 5 MINUTOS para seleccionar la opcion con tu edad o EL BOT TE ELIMINARÁ."
+                "🇧🇷Selecione sua idade usando os botões abaixo. Ignore esta mensagem e você será removido pelo bot em alguns minutos .\n\n"
+                
             ),
             parse_mode=parse_mode,
             reply_markup=keyboard
