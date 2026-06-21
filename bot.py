@@ -12,6 +12,7 @@ from telegram.ext import (
     ContextTypes,
     CallbackQueryHandler,
     MessageHandler,
+    CommandHandler,
     filters,
 )
 
@@ -220,6 +221,59 @@ async def edad_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
 # =========================================
+# VERIFICAR MANUALMENTE
+# =========================================
+
+async def verificar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    miembro = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if miembro.status not in ["administrator", "creator"]:
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "Responde al mensaje de verificación del usuario."
+        )
+        return
+
+    mensaje = update.message.reply_to_message
+
+    if not mensaje.from_user.is_bot:
+        return
+
+    user_id = None
+
+    for uid, datos in usuarios.items():
+        if datos["mensaje_id"] == mensaje.message_id:
+            user_id = uid
+            break
+
+    if user_id is None:
+        return
+
+    datos = usuarios[user_id]
+
+    datos["respondio"] = True
+
+    try:
+        await context.bot.delete_message(
+            datos["chat_id"],
+            datos["mensaje_id"]
+        )
+    except:
+        pass
+
+    usuarios.pop(user_id, None)
+
+    await update.message.reply_text(
+        "✅ Usuario verificado manualmente."
+    )
+
+# =========================================
 # CONTROL TIEMPO
 # =========================================
 
@@ -280,6 +334,13 @@ app.add_handler(
 app.add_handler(
     CallbackQueryHandler(
         edad_callback
+    )
+)
+
+app.add_handler(
+    CommandHandler(
+        "verificar",
+        verificar
     )
 )
 
