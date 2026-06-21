@@ -269,9 +269,16 @@ async def verificar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     usuarios.pop(user_id, None)
 
-    await update.message.reply_text(
+    msg = await update.message.reply_text(
         "✅ Usuario verificado manualmente."
     )
+
+    await asyncio.sleep(5)
+
+    try:
+        await msg.delete()
+    except:
+        pass
 
 # =========================================
 # CONTROL TIEMPO
