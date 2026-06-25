@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 from telegram import (
     Update,
@@ -20,8 +21,7 @@ from telegram.ext import (
 # TOKEN DEL BOT
 # =========================================
 
-TOKEN = "7929600422:AAGKteeUmQOO3ckzGHWVuIEcVivirBmB0S8"
-
+TOKEN = os.getenv("TOKEN")
 # =========================================
 # GUARDAR USUARIOS
 # =========================================
